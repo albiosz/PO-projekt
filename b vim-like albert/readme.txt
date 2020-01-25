@@ -1,9 +1,10 @@
-Vim like backend - skrócona instrukcja
+Vim like backend - instrukcja użytkowania - W RAZIE BRAKÓW ALBO BŁĘDÓW W KODZIE PISZCIE NA FB ;)
+
 
 1. Konstrukcja funkcji pośredniczącej między backendem, a toolem - bind
 backend->bind( (1)komenda, (2)funkcja, (3)instrukcja ) przykładowe wywołanie "backend->bind("#vim#:a<ENTER>", fun, "Help guidance instructions")"
 
-(1)komenda - mogą być w stylu "vimowski" (np. ":a"), jedno znakowe (np. "a"), albo <CTRL> + litera (np. "<CTRL>W")
+(1)komenda - mogą być w stylu "vimowski" (np. ":a"), jedno znakowe (np. "a"), <CTRL> + litera (np. "<CTRL>W") lub strzałki ("<UP>", "<DOWN>","<LEFT>","<RIGHT>").
 UWAGA! Komenda <CTRL> nie działa z literami Q, S, J, Z, C, M
 
 
@@ -16,7 +17,7 @@ back -> bind(":c<ENTER>.some comment",[&]() mutable {front.testFunc();},"Instruc
 
 (3)instrukcja - tekst, który będzie wyświetlał się po uruchomieniu sekcji "help"
 
-Przykładowe wywołania (są też w main.cpp):
+Przykładowe wywołania;
 back -> bind("<EDITION>", [&]() mutable {front.editMode();}, "Edition mode"); <-- przypisanie funkcji odpowiedzialnej za tryb edycji
 back -> bind("#vim#:a<ENTER>%some comment", [&]() mutable {front.testFunc1();},"instruction"); <-- po "%" albo "." można zamieścić komentarz
 back -> bind("#vim#:a<ENTER>",[&]() mutable {front.testFunc1();},"instruction");
@@ -31,4 +32,6 @@ back -> bind("#vim#:open ${FILE_NAME}<ENTER>", &OneFrontend::methA, "Open a file
 
 3. Komneda żeby wyjść z backendu :q, :quit, ZZ. Przy wychodzeniu zostanie sprawdzona wartość toola "IS_SAVED" == "NO" (tool->getEntry("IS_SAVED") == "NO")). Jeśli zostanie zwrócona wartość "true" to użytkownik zostanie zapytany czy na pewno ma zamiar opóścić aplikację.
 
-4. W trybie edycji, znajdujemy się w pętli w której wywołujemy funkcję odpowiedzialną za tryb edycji, a następnie pobieramy jeden znak z klawiatury, który zostanie zapisany w sekcji "KEY" np. tool->getEntry("KEY","A").
+4. W trybie edycji  pobieramy jeden znak z klawiatury, który zostanie zapisany w sekcji "KEY" np. tool->getEntry("KEY","A").
+
+5. Konieczne jest zbindowanie funkcji refreshRoutine (np. back -> setRefreshRoutine([&]() mutable {this -> refreshRoutine();});). Powinna to być funkcja która odświerza zawartość ekranu (backend przed jej wykonaniem zeruje wszystko co jest na ekranie - tutaj mogą być różne koncepcje dlatego w razie konfliktu można dokonać zmiany)

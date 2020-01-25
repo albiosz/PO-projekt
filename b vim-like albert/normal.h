@@ -10,7 +10,6 @@
 #include "frontend.h"
 
 #define ENTER 10
-#define BS 127
 #define ESC 27
 
 struct Command{
@@ -33,11 +32,14 @@ private:
 	int columns,rows; // rozmiary okna
 	std::vector<Command> commands;
 	std::string write();
-	Frontend *frontend;
 	void printMode(std::string);
+
 
 protected:
 	std::function<void()> edition;
+	std::function<void()> refreshRoutine;
+    Frontend *frontend;
+    WINDOW *win;
 
 public:
 	Normal(Frontend* front);
@@ -47,5 +49,5 @@ public:
 	bool chooseFunction(std::string com);
 	void eraseChar();
 	char quit();
-    std::string ctrlAndArrowsHandling(char c);
+    std::string ctrlAndArrowsHandling(int c);
 };

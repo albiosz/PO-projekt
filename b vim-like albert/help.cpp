@@ -17,8 +17,8 @@ void Help::addHelpLine(std::string command, std::string instruction) {
             continue;
         }
         else if (helplines[i].instr == instruction){
-            std::vector<HelpLine>::iterator it = helplines.begin() + i;
             newCommand = helplines[i].com + " or " + command;
+            std::vector<HelpLine>::iterator it = helplines.begin() + i;
             helplines.erase(it);
         }
 

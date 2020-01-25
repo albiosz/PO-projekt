@@ -7,8 +7,16 @@ VimLike::VimLike(Frontend* front) : Normal(front){
 
 void VimLike::runBackend(){
 	initscr(); //start
+	refreshRoutine = nullptr;
+	frontend->setBackend(this);
 	noecho();
-    normalMode();
+	cbreak();
+    keypad(stdscr, TRUE);
+    if (refreshRoutine == nullptr){
+        printw("ERROR: Bind refreshing routine!\n");
+        getch();
+    }
+    else normalMode();
     endwin();
 }
 
@@ -18,44 +26,46 @@ void VimLike::bind(std::string key_comb, std::function<void()> func, std::string
 	if (key_comb.length() <= 0) return; // if there are no characters just quit the func
 
 	int idxOfComment = findComment(key_comb);
+    std::string comment = "";
 	if (idxOfComment == 0) return; // if it's all comment, quit
-	else if (idxOfComment > 0) key_comb1 = key_comb1.substr(0,idxOfComment); // cut comment from command
-
-	if (key_comb1.substr(0,5) == "#vim#" or key_comb[0] != '#'){
-
-		if (key_comb1.substr(0,5) == "#vim#") // erase #vim# from command
-			key_comb1 = key_comb1.substr(5);
-
-		if (key_comb1 == "<EDITION>") {
-			edition = func;
-			return;
-		}
-
-		bool edit_mode = false;
-		if (key_comb1.length() > 5 && key_comb1.substr(key_comb1.length()-5) == "!EDIT") {
-            edit_mode = true;
-            key_comb1 = key_comb1.substr(0, key_comb1.length() - 5);
-        }
-
-		addHelpLine(key_comb1,instr);
-
-        key_comb1 = replaceSpecial(key_comb1);
-
-		int pos_$ = key_comb1.find('$');
-		if (pos_$ != std::string::npos){
-			std::string entry = key_comb1.substr(pos_$);
-			int start = entry.find('{');
-			int length = entry.find('}') - start - 1;
-			entry = entry.substr(start+1,length);
-
-			key_comb1 = key_comb1.substr(0,pos_$ - 1);
-			//std::cout << key_comb1 << "," << entry <<std::endl;
-
-			addCommand(key_comb1, entry, edit_mode, func);
-
-		}
-		else addCommand(key_comb1, "", edit_mode, func);
+	else if (idxOfComment > 0){
+        comment = key_comb1.substr(idxOfComment);
+        key_comb1 = key_comb1.substr(0,idxOfComment); // cut comment from command
 	}
+
+	if (!(key_comb1.substr(0,5) == "#vim#" or key_comb[0] != '#')) return; // check if it's for vim or every backend
+
+    if (key_comb1.substr(0,5) == "#vim#") // erase #vim# from command
+        key_comb1 = key_comb1.substr(5);
+
+    if (key_comb1 == "<EDITION>") {
+        edition = func;
+        return;
+    }
+    bool edit_mode = false;
+    if (key_comb1.length() > 5 && key_comb1.substr(key_comb1.length()-5) == "!EDIT") {
+        edit_mode = true;
+        key_comb1 = key_comb1.substr(0, key_comb1.length() - 5);
+    }
+
+    addHelpLine(key_comb1+comment,instr);
+
+    key_comb1 = replaceSpecial(key_comb1);
+
+    int pos_$ = key_comb1.find('$');
+    if (pos_$ != std::string::npos){
+        std::string entry = key_comb1.substr(pos_$);
+        int start = entry.find('{');
+        int length = entry.find('}') - start - 1;
+        entry = entry.substr(start+1,length);
+
+        key_comb1 = key_comb1.substr(0,pos_$ - 1);
+        //std::cout << key_comb1 << "," << entry <<std::endl;
+
+        addCommand(key_comb1, entry, edit_mode, func);
+
+    }
+    else addCommand(key_comb1, "", edit_mode, func);
 
 }
 
@@ -80,4 +90,8 @@ int VimLike::findComment(std::string command){
 			return i;
 
 	return -1;
+}
+
+void VimLike::setRefreshRoutine(std::function<void()> reFunc){
+    refreshRoutine = reFunc;
 }

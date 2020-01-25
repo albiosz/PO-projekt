@@ -5,21 +5,52 @@ Normal::Normal(Frontend* front){
     frontend = front;
 }
 
-void Normal::addCommand(std::string com, std::string entry, bool edit_mode, std::function<void()> func){
-    for (int i=0; i < commands.size(); i++){
-        if (commands[i].com == com){
-            auto it = commands.begin() + i;
-            commands.erase(it);
-            break;
-        }
-    }
-    commands.push_back(Command{com, entry, edit_mode, func});
+char Normal::normalMode(){
+
+	getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
+    std::string command="";
+	do{
+        printMode("normal");
+        move(0,0);
+
+        int c;
+        c = getch();
+    	//c = wgetch(stdscr);
+        //printw("%d",c);
+    	switch (c){
+            case 'Z': // press double 'Z' to exit
+                if (getch() == 'Z') return quit();
+                break;
+    		case ':':
+    			command = write(); // command which starting with : and confirmed by enter
+    			break;
+    		default:
+    		    if ((c>=0 && c<=31 && c!=ENTER) || (c>=258 && c<=261))
+    		        command = ctrlAndArrowsHandling(c);
+    		    else
+                    command = std::string(1,c); // one character command
+
+                //std::cout << command << std::endl;
+    		    break;
+    	}
+        move(0,0);
+        clear();
+    	if (!command.empty()){
+    		if (command == ":q" || command == ":quit") return quit();
+            else if (command ==":h" || command == ":help") printHelp();
+            else chooseFunction(command);
+    	}
+        refreshRoutine();
+
+        command = "";
+
+    } while(true);
 }
 
 bool Normal::chooseFunction(std::string com){
 
     std::string comI = com.substr(0,com.find(' '));
-    
+
     for (Command comm : commands){
         if (comm.com == comI){
             if (comm.entry.length() > 0){
@@ -39,45 +70,10 @@ bool Normal::chooseFunction(std::string com){
                 printMode("edit");
                 editMode();
             }
+
             break;
         }
     }
-}
-
-char Normal::normalMode(){
-
-	getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
-    std::string command="";
-	do{
-        printMode("normal");
-        move(0,0);
-
-        char c;
-    	c = getch();
-    	switch (c){
-            case 'Z': // press double 'Z' to exit
-                if (getch() == 'Z') return quit();
-                break;
-    		case ':':
-    			command = write(); // command which starting with : and confirmed by enter
-    			break;
-    		default:
-    		    if ((c>=0 && c<=31 && c!=ENTER) || (c>=65 && c<=68))
-    		        command = ctrlAndArrowsHandling(c);
-    		    else
-                    command = std::string(1,c); // one character command
-    		    break;
-    	}
-        move(0,0);
-    	if (!command.empty()){
-    		if (command == ":q" || command == ":quit") return quit();
-            else if (command ==":h" || command == ":help") printHelp();
-            else chooseFunction(command);
-
-    	}
-        command = "";
-
-    } while(true);
 }
 
 char Normal::quit(){
@@ -97,12 +93,12 @@ std::string Normal::write(){
     printw(":");
     std::string text = ":";
 	while(true){
-		char c = getch();
+		int c = getch();
 		switch(c){
 			case ESC:
 				return "";
 				break;
-			case BS:
+			case KEY_BACKSPACE:
 			    if (text.length() > 1) {
                     eraseChar();
                     text = text.substr(0, text.size() - 1);
@@ -110,7 +106,6 @@ std::string Normal::write(){
                 break;
     		case ENTER:
     			return text;
-                break;
     		default:
                 printw("%c",c);
                 text += c;
@@ -144,23 +139,47 @@ void Normal::eraseChar(){
 
 void Normal::editMode() {
     char c;
-    while(true){
-        edition();
-        c = getch();
-        switch(c) {
-            case ESC:
-                return;
-            default:
-                frontend->setEntry("KEY", std::string(1, c));
-        }
+    c = getch();
+    switch(c) {
+        case ESC:
+            return;
+        default:
+            frontend->setEntry("KEY", std::string(1, c));
     }
 
 }
 
-std::string Normal::ctrlAndArrowsHandling(char c) {
+std::string Normal::ctrlAndArrowsHandling(int c) {
     std::string toReturn = "";
-    if (c >= 0 && c <= 31)
-        toReturn = "<CTRL>" + std::string(1,c+64);
+
+    switch(c){
+        case KEY_UP:
+            toReturn = "<UP>";
+            break;
+        case KEY_DOWN:
+            toReturn = "<DOWN>";
+            break;
+        case KEY_LEFT:
+            toReturn = "<LEFT>";
+            break;
+        case KEY_RIGHT:
+            toReturn = "<RIGHT>";
+            break;
+        default: // it is considered as a ctrl by default
+            toReturn = "<CTRL>" + std::string(1,c+64);
+    }
 
     return toReturn;
+}
+
+
+void Normal::addCommand(std::string com, std::string entry, bool edit_mode, std::function<void()> func){
+    for (int i=0; i < commands.size(); i++){
+        if (commands[i].com == com){
+            auto it = commands.begin() + i;
+            commands.erase(it);
+            break;
+        }
+    }
+    commands.push_back(Command{com, entry, edit_mode, func});
 }

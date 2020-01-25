@@ -17,9 +17,10 @@ private:
 
 public:
 	VimLike(Frontend*);
-	VimLike();
-	void runBackend();
-	void bind(std::string,std::function<void()>, std::string);
+    void runBackend() override;
+	void bind(std::string,std::function<void()>, std::string) override;
+	void setRefreshRoutine(std::function<void()>) override;
 	int findComment(std::string);
     std::string replaceSpecial(std::string);
+
 };
