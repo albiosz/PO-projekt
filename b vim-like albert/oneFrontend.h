@@ -78,7 +78,8 @@ public:
         back -> setRefreshRoutine([&]() mutable {this -> refreshRoutine();});
 
         back -> bind("<EDITION>", [&]() mutable {this -> editMode2();}, "Edition mode");
-        back -> bind("#vim#:a<ENTER>%some comment", [&]() mutable {this -> testFunc1();},"This is sample instruction which prints 'testFunc'");
+        back -> bind("#vim#:a<ENTER>%some comment", [&]() mutable {this -> testFunc();},"This is sample instruction which prints 'testFunc'");
+        back -> bind("#vim#:a<ENTER>", [&]() mutable {this -> testFunc1();},"This is sample instruction which prints 'testFunc'");
         back -> bind("#vim#a",[&]() mutable {this -> testFunc1();},"This is sample instruction which prints 'testFunc1'");
         back -> bind(":c<ENTER>.some comment",[&]() mutable {this -> testFunc();},"This is sample instruction which prints 'testFunc'");
         back -> bind(".:d<ENTER>.some comment",[&]() mutable {this -> testFunc();},"This is sample instruction which prints 'testFunc'");

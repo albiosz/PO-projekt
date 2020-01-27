@@ -7,6 +7,7 @@
 
 struct HelpLine{
 	std::string com;
+	std::string comment;
 	std::string instr;
 };
 
@@ -17,6 +18,6 @@ private:
 
 public:
 	Help();
-	void addHelpLine(std::string, std::string);
+	void addHelpLine(std::string,std::string, std::string="");
 	void printHelp();
 };

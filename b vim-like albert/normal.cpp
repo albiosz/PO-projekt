@@ -32,11 +32,14 @@ char Normal::normalMode(){
     		    break;
     	}
         move(0,0);
-        clear();
+        //clear();
     	if (!command.empty()){
-    		if (command == ":q" || command == ":quit") return quit();
-            else if (command ==":h" || command == ":help") printHelp();
-            else chooseFunction(command);
+    		if (command == ":q" || command == ":quit")
+    		    return quit();
+            else if (command ==":h" || command == ":help")
+                printHelp();
+            else
+                chooseFunction(command);
     	}
         refreshRoutine();
 
@@ -45,38 +48,37 @@ char Normal::normalMode(){
     } while(true);
 }
 
-bool Normal::chooseFunction(std::string com){
+bool Normal::chooseFunction(const std::string com){
 
     std::string comI = com.substr(0,com.find(' '));
 
-    for (Command comm : commands){
-        if (comm.com == comI){
-            if (comm.entry.length() > 0){
+    if (commands.find(comI) != commands.end()){
+        if (commands[comI].entry.length() > 0){
 
-                int pos = com.find(' ');
-                if (pos != std::string::npos){
-                    std::string entry_value = com.substr(pos + 1);
-                    frontend -> setEntry(comm.entry, entry_value);
-                } else {
-                    getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
-                    move(rows-2,0);
-                    clrtoeol();
-                    printw("ERROR: Invoked function without parameter!");
-                    return false;
-                }
+            unsigned int pos = com.find(' ');
+            if (pos != std::string::npos){
+                std::string entry_value = com.substr(pos + 1);
+                frontend -> setEntry(commands[comI].entry, entry_value);
+            } else {
+                getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
+                move(rows-2,0);
+                clrtoeol();
+                printw("ERROR: Invoked function without parameter!");
+                return false;
             }
-
-            if (comm.edit_mode){
-                edition();
-                printMode("edit");
-                editMode();
-            }
-
-            comm.function();
-
-            return true;
         }
+
+        if (commands[comI].edit_mode){
+            edition();
+            printMode("edit");
+            editMode();
+        }
+
+        commands[comI].function();
+
+        return true;
     }
+    return false;
 }
 
 char Normal::quit(){
@@ -175,12 +177,9 @@ std::string Normal::ctrlAndArrowsHandling(int c) {
 
 
 void Normal::addCommand(std::string com, std::string entry, bool edit_mode, std::function<void()> func){
-    for (int i=0; i < commands.size(); i++){
-        if (commands[i].com == com){
-            auto it = commands.begin() + i;
-            commands.erase(it);
-            break;
-        }
+    if (commands.find(com) != commands.end()){
+        auto it = commands.find(com);
+        commands.erase(it);
     }
-    commands.push_back(Command{com, entry, edit_mode, func});
+    commands[com] = Command{entry, edit_mode, func};
 }

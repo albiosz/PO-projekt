@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <functional>
+#include <map>
 
 #include "help.h"
 #include "frontend.h"
@@ -13,19 +14,19 @@
 #define ESC 27
 
 struct Command{
-	std::string com;
 	std::string entry;
 	bool edit_mode;
 	std::function<void()> function;
 };
 
+//adsfasdf
+
 class Normal : public Help {
 private:
 	int columns,rows; // rozmiary okna
-	std::vector<Command> commands;
 	std::string write();
 	void printMode(std::string);
-
+    std::map<std::string, Command> commands;
 
 protected:
 	std::function<void()> edition;

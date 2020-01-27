@@ -48,7 +48,7 @@ void VimLike::bind(std::string key_comb, std::function<void()> func, std::string
         key_comb1 = key_comb1.substr(0, key_comb1.length() - 5);
     }
 
-    addHelpLine(key_comb1+comment,instr);
+    addHelpLine(key_comb1,instr,comment);
 
     key_comb1 = replaceSpecial(key_comb1);
 
@@ -76,7 +76,6 @@ std::string VimLike::replaceSpecial(std::string key_comb){
     }
 
     if (key_comb1.empty()){
-        std::cout << key_comb1 << " ";
         key_comb1 = "\n";
     }
 
@@ -84,7 +83,7 @@ std::string VimLike::replaceSpecial(std::string key_comb){
 }
 
 int VimLike::findComment(std::string command){
-	for (int i = 0; i < command.length(); i++)
+	for (unsigned int i = 0; i < command.length(); i++)
 		if (command[i] == '%' || command[i] == '.')
 			return i;
 
