@@ -57,10 +57,9 @@ void VimLike::bind(std::string key_comb, std::function<void()> func, std::string
         std::string entry = key_comb1.substr(pos_$);
         int start = entry.find('{');
         int length = entry.find('}') - start - 1;
-        entry = entry.substr(start+1,length);
+        entry = entry.substr(start+1,length); // name of entry
 
-        key_comb1 = key_comb1.substr(0,pos_$ - 1);
-        //std::cout << key_comb1 << "," << entry <<std::endl;
+        key_comb1 = key_comb1.substr(0,pos_$ - 1); // key_comb1 without entry structure
 
         addCommand(key_comb1, entry, edit_mode, func);
 

@@ -15,8 +15,6 @@ char Normal::normalMode(){
 
         int c;
         c = getch();
-    	//c = wgetch(stdscr);
-        //printw("%d",c);
     	switch (c){
             case 'Z': // press double 'Z' to exit
                 if (getch() == 'Z') return quit();
@@ -57,13 +55,16 @@ bool Normal::chooseFunction(std::string com){
 
                 int pos = com.find(' ');
                 if (pos != std::string::npos){
-
-                    std::string entry_value = com.substr(com.find(' ') + 1);
+                    std::string entry_value = com.substr(pos + 1);
                     frontend -> setEntry(comm.entry, entry_value);
+                } else {
+                    getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
+                    move(rows-2,0);
+                    clrtoeol();
+                    printw("ERROR: Invoked function without parameter!");
+                    return false;
                 }
             }
-
-            comm.function();
 
             if (comm.edit_mode){
                 edition();
@@ -71,7 +72,9 @@ bool Normal::chooseFunction(std::string com){
                 editMode();
             }
 
-            break;
+            comm.function();
+
+            return true;
         }
     }
 }
@@ -109,8 +112,6 @@ std::string Normal::write(){
     		default:
                 printw("%c",c);
                 text += c;
-                // char cstr[text.size()+1];
-                // strcpy(cstr, text.c_str());
                 break;
 		}
 	}

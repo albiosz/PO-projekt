@@ -19,14 +19,6 @@ struct Command{
 	std::function<void()> function;
 };
 
-struct Key
-{
-    std::string text;
-    int num;
-};
-
-const Key keys[] {Key{"<ENTER>", 10}, Key{"<ESC>", 27}};
-
 class Normal : public Help {
 private:
 	int columns,rows; // rozmiary okna
@@ -39,7 +31,6 @@ protected:
 	std::function<void()> edition;
 	std::function<void()> refreshRoutine;
     Frontend *frontend;
-    WINDOW *win;
 
 public:
 	Normal(Frontend* front);
