@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "pytanie.h"
+#include "backend.h"
 #define PROG 75
 #define PYT 25
 
@@ -104,7 +105,7 @@ int main(int argv, char *argc[])
 {
     Pytanie pytania[PYT];
     int tryb;
-    char funkcja;
+    //char funkcja;
     wprowadz(pytania);
     cout << "Witaj w QUIZIE!";
     while (1) {
