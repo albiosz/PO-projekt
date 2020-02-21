@@ -8,11 +8,11 @@
 #include "pytanie.h"
 #include "backend.h"
 #define PROG 75
-#define PYT 25
+#define PYT 50
 
 int wynik = 0;
 int l_pytan;
-
+fstream plik;
 
 void zdaneczynie(float a,int b)
 {
@@ -29,13 +29,21 @@ void zdaneczynie(float a,int b)
 
 //funkcja do zczytania z pliku quizu
 
-void wprowadz(class Pytanie *p)
+void wprowadz(class Pytanie *p,string nazwa)
 {   int i;
-    for (i = 0; i <= 9; i++) {
+    int count = 0;
+    l_pytan = 0;
+    string linia;
+    //fstream plik;
+    plik.open(nazwa,ios::in);
+    while (getline(plik,linia)) { count++;}
+    for (i=0;i<count/5;i++) {
         p[i].nr_pytania = i + 1;
-        p[i].wczytaj();
+        p[i].wczytaj(nazwa);
     }
-    l_pytan = 9; //pytan jest o 1 wiecej ale w tablicy obiektow numerujemy od zera
+    plik.close();
+
+    l_pytan = count/6-1 ; //pytan jest o 1 wiecej ale w tablicy obiektow numerujemy od zera
 }
 
 // funkcja przeprowadza test i sumuje uzyskana liczbe punktow
@@ -53,18 +61,19 @@ int rozw_quiz(class Pytanie *p)
     cout << "KONIEC QUIZU!\n";
     zdaneczynie(suma_pkt,i);
 
+    return 0;
 }
 // funkcja sprawdz, czy uzytkownik zdal test czy nie
 
 
 int otworz(string nazwa) {
-    fstream plik;
-    plik.open(nazwa, ios::out | ios::app);
+    plik.open(nazwa, ios::out | ios::trunc);
     if (plik.good() == true) {
         cout << "Udalo sie otworzyc plik pomyslnie! :D" << endl;
-    }
-}
+    } else cout << "Nie udalo sie otworzyc pliku" << endl;
 
+    return 0;
+}
 
 void dodaj_pyt(class Pytanie *wsk)
 {
@@ -101,12 +110,39 @@ void dodaj_pyt(class Pytanie *wsk)
     wsk[l_pytan].odp_pop = buf;
 }
 
+void zapisz_plik(class Pytanie *p)
+{
+    int i;
+    string miejsce;
+    string nazwa;
+    string pelna;
+    cout << "Podaj pelna sciezke miejsca, w ktorym chcesz zapisac plik z quizem:" << endl;
+    cin >> miejsce;
+    cout << "Podaj nazwe pliku z rozszerzeniem .txt:" << endl;
+    cin >> nazwa;
+    pelna = miejsce+"/"+nazwa;
+    cout << pelna << endl;
+    otworz(pelna);
+    for (i=0; i<=l_pytan; i++)
+    {
+        plik << p[i].tresc << endl;
+        plik << p[i].a << endl;
+        plik << p[i].b << endl;
+        plik << p[i].c << endl;
+        plik << p[i].d << endl;
+        plik << p[i].odp_pop << endl;
+    }
+    plik.close();
+
+
+
+}
+
 int main(int argv, char *argc[])
 {
     Pytanie pytania[PYT];
     int tryb;
-    //char funkcja;
-    wprowadz(pytania);
+    char funkcja;
     cout << "Witaj w QUIZIE!";
     while (1) {
         cout <<  "\n\nWybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej cyfry i zatwierdzenie jej ENTEREM" << endl;
@@ -115,20 +151,31 @@ int main(int argv, char *argc[])
         cin >> tryb;
         if (tryb==1)
         {
-            //cout << "Wybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej litery i zatwierdzenie jej ENTEREM" << endl;
-            //cout << "a - Dodaj nowe pytanie do quizu\n";
-            //cin >> funkcja;
-            //if (funkcja=='a') dodaj_pyt(pytania);
-            dodaj_pyt(pytania);
+            string quiz;
+            string plus = "t";
+            cout << "Ktory chcesz zedytowac quiz?" << endl;
+            cin >> quiz;
+            wprowadz(pytania,quiz);
+            while (plus == "t") {
+                dodaj_pyt(pytania);
+                cout << "Czy chcesz dodac kolejne pytanie? Wpisz \"t\" jesli tak, dowolny znak jesli nie:" << endl;
+                cin >> plus;
+            }
+            cout << "Czy chcesz zapisać zedytowany przez Ciebie quiz?" << endl;
+            cout << "Jeśli tak, wpisz na klawiaturze litere \"t\"\nJesli nie, wpisz litere \"n\":\n";
+            cin >> funkcja;
+            if (funkcja=='t') zapisz_plik(pytania);
+            if (funkcja=='n') cout << "Twoj zedytowany plik nie zostal zapisany" << endl;
         }
 
         else if (tryb==2)
         {
-            //cout << "Wybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej litery i zatwierdzenie jej ENTEREM" << endl;
-            //cout << "a - Rozwiaz quiz\n";
-            //cin >> funkcja;
-            //if (funkcja=='a') rozw_quiz(pytania);
+            string quiz;
+            cout << "Ktory chcesz uruchomic quiz? (jesli quiz jest spoza tego folderu dodaj sciezke)" << endl;
+            cin >> quiz;
+            wprowadz(pytania,quiz);
             rozw_quiz(pytania);
+
         }
         else if (tryb==3)
         {

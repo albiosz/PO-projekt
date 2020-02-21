@@ -19,7 +19,9 @@ public:
     int punkt; //0 lub 1, zla lub dobra odpowiedz
 
 
-    void wczytaj(); //fcja wczytuje dane z pliku
+
+
+    void wczytaj(string nazwa); //fcja wczytuje dane z pliku
     void zadaj(); //fcja zada pytanie uzytkownikowi, wyswietli je na ekranie
     void sprawdz(); //fcja sprawdzi, czy uzytkownik dobrze odpowiedzial
 };

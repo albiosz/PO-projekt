@@ -7,10 +7,10 @@
 #include <cstdlib>
 
 
-void Pytanie::wczytaj()
+void Pytanie::wczytaj(string nazwa)
 {
     fstream plik;
-    plik.open("quiz.txt",ios::in);
+    plik.open(nazwa,ios::in);
 
     if(!plik.good())
     {
@@ -58,3 +58,7 @@ void Pytanie::sprawdz()
     }
     else punkt=0;
 }
+
+
+
+
