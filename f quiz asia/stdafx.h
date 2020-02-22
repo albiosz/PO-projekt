@@ -1,0 +1,13 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <map>
+#include <string>
+#include <ncurses.h>
+#include <vector>
+#include <cstring>
+#include <functional>
+#include <algorithm>

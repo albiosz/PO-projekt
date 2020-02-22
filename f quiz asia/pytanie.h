@@ -1,11 +1,8 @@
 //
 // Created by Joanna Adamczyk on 2019-12-23.
 //
-#ifndef PROGRAMOWANIE_OBIEKTOWE_PYTANIE_H
-#define PROGRAMOWANIE_OBIEKTOWE_PYTANIE_H
-
-#include <iostream>
-
+#pragma once
+#include "stdafx.h"
 using namespace std;
 
 class Pytanie
@@ -20,12 +17,59 @@ public:
 
 
 
-
     void wczytaj(string nazwa); //fcja wczytuje dane z pliku
     void zadaj(); //fcja zada pytanie uzytkownikowi, wyswietli je na ekranie
     void sprawdz(); //fcja sprawdzi, czy uzytkownik dobrze odpowiedzial
 };
 
+void Pytanie::wczytaj(string nazwa)
+{
+    fstream plik;
+    plik.open(nazwa,ios::in);
 
+    if(!plik.good())
+    {
+        cout<<"Nie mozna otworzyc pliku!";
+        exit(0); //konczymy prace programu
+    }
 
-#endif //PROGRAMOWANIE_OBIEKTOWE_PYTANIE_H
+    int nr_linii=(nr_pytania-1)*6+1;
+    int aktualny_nr=1;
+    string linia;
+
+    while(getline(plik,linia))
+    {
+        if(aktualny_nr==nr_linii) tresc=linia;
+        if(aktualny_nr==nr_linii+1) a=linia;
+        if(aktualny_nr==nr_linii+2) b=linia;
+        if(aktualny_nr==nr_linii+3) c=linia;
+        if(aktualny_nr==nr_linii+4) d=linia;
+        if(aktualny_nr==nr_linii+5) odp_pop=linia;
+        aktualny_nr++;
+    }
+
+    plik.close();
+
+}
+
+void Pytanie::zadaj()
+{
+    cout << endl << tresc << endl;
+    cout << a << endl;
+    cout << b << endl;
+    cout << c << endl;
+    cout << d << endl;
+    cout<< "------------------------" << endl;
+    cout<< "Odpowiedz: ";
+    cin >> odp_usr;
+}
+
+void Pytanie::sprawdz()
+{
+    transform(odp_usr.begin(),odp_usr.end(),odp_usr.begin(),::tolower); //gdyby uzytkownik mial wlaczony capslock, fcja zmieni duza litere na mala
+    if(odp_usr==odp_pop)
+    {
+        punkt=1;
+    }
+    else punkt=0;
+}
