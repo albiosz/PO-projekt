@@ -10,6 +10,9 @@
 
 class Quiz : public Pytanie
 {
+
+
+public:
     int wynik = 0;
     int l_pytan;
     fstream plik;
@@ -45,7 +48,6 @@ class Quiz : public Pytanie
     }
 
 
-public:
     void wprowadz(Pytanie *p, string nazwa)
     {   int i;
         int count = 0;
@@ -139,16 +141,24 @@ int rozw_quiz(Pytanie *p)
         }
         plik.close();
     }
+
+
+
 };
 
 class Interfejs : public Quiz
 {
+public:
     Pytanie pytania[PYT];
     int tryb;
     char funkcja;
     int rows, columns;
-
-public:
+    static void eraseChar(){
+        int x,y;
+        getyx(curscr,y,x);
+        move(y,--x);
+        delch();
+    }
 
 
 
@@ -194,6 +204,102 @@ public:
             }
         }
     }
+
+    void wprowadz(Pytanie *p, string nazwa)
+    {   int i;
+        int count = 0;
+        l_pytan = 0;
+        string linia;
+        plik.open(nazwa,ios::in);
+        while (getline(plik,linia)) { count++;}
+        for (i=0;i<count/5;i++) {
+            p[i].nr_pytania = i + 1;
+            p[i].wczytaj(nazwa);
+        }
+        plik.close();
+
+        l_pytan = count/6-1 ; //pytan jest o 1 wiecej ale w tablicy obiektow numerujemy od zera
+    }
+
+    void witaj()
+    {
+        move(0,0);
+        printw("%s\n", "Witaj w QUIZIE!");
+        printw("%s\n", "\nWybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej cyfry i zatwierdzenie jej ENTEREM");
+        printw("%s\n", "1 - Tryb edycji pytan");
+        printw("%s\n", "2 - Tryb rozwiazywania quizu");
+        printw("%s\n", "3 - Wyjdz z programu");
+    }
+
+    void edycja(const std::string& quiz) {
+        move(7, 0);
+        printw("%s\n", "Ktory chcesz zedytowac quiz?");
+        wprowadz(pytania, quiz);
+
+    }
+
+
+    void editMode(){
+        static int x=0,y=0; // position of a cursor
+        getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
+        move(rows-1,0);
+        clrtoeol();
+        printw("-- Edit Mode --");
+        move(y,x);
+        char c;
+        do{
+            c = getch();
+            switch (c){
+                case 27:
+                    getyx(curscr,y,x);
+                    return;
+                    break;
+                case 127:
+                    eraseChar();
+                    break;
+                default:
+                    printw("%c",c);
+                    break;
+            }
+
+        } while(true);
+    }
+
+    void dodaj_pyt(Pytanie *wsk)
+    {
+        string buf;
+        char buff[512];
+        l_pytan++;
+        getline(cin,buf);
+        cout << "Zadaj pytanie:" << endl;
+        getline(cin,buf);
+        wsk[l_pytan].tresc=buf;
+        wsk[l_pytan].nr_pytania = l_pytan+1;
+        cout << "Podaj pierwsza odpowiedz" <<endl;
+        getline(cin,buf);
+        strcpy(buff,"a) ");
+        strcat(buff,buf.c_str());
+        wsk[l_pytan].a = buff;
+        cout << "Podaj druga odpowiedz" <<endl;
+        getline(cin,buf);
+        strcpy(buff,"b) ");
+        strcat(buff,buf.c_str());
+        wsk[l_pytan].b = buff;
+        cout << "Podaj trzecia odpowiedz" <<endl;
+        getline(cin,buf);
+        strcpy(buff,"c) ");
+        strcat(buff,buf.c_str());
+        wsk[l_pytan].c = buff;
+        cout << "Podaj czwarta odpowiedz" <<endl;
+        getline(cin,buf);
+        strcpy(buff,"d) ");
+        strcat(buff,buf.c_str());
+        wsk[l_pytan].d = buff;
+        cout << "Podaj poprawna odpowiedz: a dla pierwszej podanej odpowiedzi...d dla czwartej podanej odpowiedzi" <<endl;
+        getline(cin,buf);
+        wsk[l_pytan].odp_pop = buf;
+    }
+
 };
 
 
@@ -201,12 +307,13 @@ class Wynik : public Frontend
 {
 public:
 
+    Pytanie pytania[PYT];
     int rows, columns;
 
     void refreshRoutine(){
         static int refreshed = 0;
         getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
-        move(5, 0);
+        move(10, 0);
         printw("Refreshed%d!",refreshed);
         refreshed++;
     }
@@ -222,15 +329,22 @@ public:
 
     void setBackend(Backend *obj) override {
 
-        auto start = [&]() { this->res.start();};
+        auto witaj = [&]() { this->res.witaj();};
+        auto edycja = [this](){ this->res.edycja(entries["filename"]);};
+        auto edit = [this](){ this->res.editMode();};
+        auto dodaj = [this](){ this->res.dodaj_pyt(pytania);};
+
 
         obj -> setRefreshRoutine([&]()mutable {this -> refreshRoutine();});
-        obj -> bind("#vim#s", start, "YAaaaaay");
-
+        obj -> bind("w", witaj, "Powitalny tekst");
+        obj -> bind("e",edit,"Tryb edytowania");
+        obj -> bind("1 ${filename}<ENTER>", edycja, "Edycja pytan");
+        obj -> bind("2",dodaj,"Dodaj pytanie");
     }
 private:
 
     Interfejs res;
+    Quiz wsk;
     std::map<std::string, std::string> entries;
 
 
