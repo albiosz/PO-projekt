@@ -4,9 +4,12 @@
 #include "pytanie.h"
 #include "backend.h"
 
+using namespace std;
+
 #define PROG 75
 #define PYT 50
-
+Pytanie pytania[PYT];
+int l_pytan;
 
 class Quiz : public Pytanie
 {
@@ -14,7 +17,7 @@ class Quiz : public Pytanie
 
 public:
     int wynik = 0;
-    int l_pytan;
+
     fstream plik;
 
 
@@ -48,7 +51,7 @@ public:
     }
 
 
-    void wprowadz(Pytanie *p, string nazwa)
+    virtual void wprowadz(Pytanie *p, string nazwa)
     {   int i;
         int count = 0;
         l_pytan = 0;
@@ -149,7 +152,7 @@ int rozw_quiz(Pytanie *p)
 class Interfejs : public Quiz
 {
 public:
-    Pytanie pytania[PYT];
+
     int tryb;
     char funkcja;
     int rows, columns;
@@ -205,7 +208,7 @@ public:
         }
     }
 
-    void wprowadz(Pytanie *p, string nazwa)
+    void wprowadz(Pytanie *p, const std::string& nazwa)
     {   int i;
         int count = 0;
         l_pytan = 0;
@@ -231,12 +234,8 @@ public:
         printw("%s\n", "3 - Wyjdz z programu");
     }
 
-    void edycja(const std::string& quiz) {
-        move(7, 0);
-        printw("%s\n", "Ktory chcesz zedytowac quiz?");
-        wprowadz(pytania, quiz);
 
-    }
+
 
 
     void editMode(){
@@ -300,6 +299,24 @@ public:
         wsk[l_pytan].odp_pop = buf;
     }
 
+    int rozw_quiz(Pytanie *p)
+    {
+        int i;
+        int suma_pkt = 0; //suma zdobytych punktow
+        for (i = 0; i <= l_pytan; i++) {
+            p[i].zadaj();
+            p[i].sprawdz();
+            suma_pkt += p[i].punkt;
+        } // tworzymy liste obietkow, czyli pytan ;)
+        wynik = suma_pkt;
+
+        printw("%s\n","KONIEC QUIZU!\n");
+        zdaneczynie(suma_pkt,i);
+
+        return 0;
+    }
+
+
 };
 
 
@@ -313,7 +330,7 @@ public:
     void refreshRoutine(){
         static int refreshed = 0;
         getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
-        move(10, 0);
+        move(5, 0);
         printw("Refreshed%d!",refreshed);
         refreshed++;
     }
@@ -321,25 +338,34 @@ public:
 
     void setEntry(std::string key, std::string value) override {
         entries[key] = value;
+        move(1,0);
+        printw("Entry set\n");
     }
 
     std::string getEntry(std::string string) override {
+        move(1,0);
+        printw("Entry set\n");
         return entries[string];
+
     }
 
     void setBackend(Backend *obj) override {
 
         auto witaj = [&]() { this->res.witaj();};
-        auto edycja = [this](){ this->res.edycja(entries["filename"]);};
+        auto struktura = [this](){ this->res.wprowadz(pytania,entries["filename"]);};
         auto edit = [this](){ this->res.editMode();};
-        auto dodaj = [this](){ this->res.dodaj_pyt(pytania);};
+        //auto dodaj = [this](){ this->res.dodaj_pyt(pytania);};
+        auto rozw = [this](){this ->res.rozw_quiz(pytania);};
 
 
         obj -> setRefreshRoutine([&]()mutable {this -> refreshRoutine();});
         obj -> bind("w", witaj, "Powitalny tekst");
+        obj -> bind("#vim#:s ${filename}<ENTER>", struktura, "Wprowadza pytania do struktury");
+        obj -> bind("r",rozw,"Rozwiaz quiz");
         obj -> bind("e",edit,"Tryb edytowania");
-        obj -> bind("1 ${filename}<ENTER>", edycja, "Edycja pytan");
-        obj -> bind("2",dodaj,"Dodaj pytanie");
+
+
+
     }
 private:
 
