@@ -27,11 +27,11 @@ public:
         procent = a/b*100;
         if (procent >= PROG)
         {
-            cout << "Brawo, zaliczyles test! :)" << endl;
+            cout << "Brawo, zaliczyles test! :)" << endl << "\r";
         }
-        else {cout << "Niestety, nie zaliczyles testu :(" << endl;}
-        cout << "Twoja suma punktow: " << a << "\n" << "Twoj wynik procentowy: " << procent << "%" << endl;
-        cout << "Aby zdac test powinienes uzyskac przynajmniej " << PROG << "%" << endl;
+        else {cout << "Niestety, nie zaliczyles testu :(" << endl << "\r";}
+        cout << "Twoja suma punktow: " << a << "\n\r" << "Twoj wynik procentowy: " << procent << "%" << endl << "\r";
+        cout << "Aby zdac test powinienes uzyskac przynajmniej " << PROG << "%" << endl << "\r";
     }
 
 
@@ -226,42 +226,28 @@ public:
 
     void witaj()
     {
-        move(0,0);
-        printw("%s\n", "Witaj w QUIZIE!");
-        printw("%s\n", "\nWybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej cyfry i zatwierdzenie jej ENTEREM");
-        printw("%s\n", "1 - Tryb edycji pytan");
-        printw("%s\n", "2 - Tryb rozwiazywania quizu");
-        printw("%s\n", "3 - Wyjdz z programu");
+        cout << "Witaj w QUIZIE!\n\r";
+        cout << "\n\rWybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej cyfry i zatwierdzenie jej ENTEREM\n\r";
+        cout <<"1 - Tryb edycji pytan\n\r";
+        cout << "2 - Tryb rozwiazywania quizu\n\r";
+        cout << "3 - Wyjdz z programu\n\r";
     }
 
+    int rozw_quiz(Pytanie *p)
+    {
+        int i;
+        int suma_pkt = 0; //suma zdobytych punkto
+        for (i = 0; i <= l_pytan; i++) {
+            p[i].zadaj();
+            p[i].sprawdz();
+            suma_pkt += p[i].punkt;
+        } // tworzymy liste obietkow, czyli pytan ;)
+        wynik = suma_pkt;
 
+        cout << endl << "\r" << "KONIEC QUIZU!\n\r";
+        zdaneczynie(suma_pkt,i);
 
-
-
-    void editMode(){
-        static int x=0,y=0; // position of a cursor
-        getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
-        move(rows-1,0);
-        clrtoeol();
-        printw("-- Edit Mode --");
-        move(y,x);
-        char c;
-        do{
-            c = getch();
-            switch (c){
-                case 27:
-                    getyx(curscr,y,x);
-                    return;
-                    break;
-                case 127:
-                    eraseChar();
-                    break;
-                default:
-                    printw("%c",c);
-                    break;
-            }
-
-        } while(true);
+        return 0;
     }
 
     void dodaj_pyt(Pytanie *wsk)
@@ -269,6 +255,7 @@ public:
         string buf;
         char buff[512];
         l_pytan++;
+        cout << "Zadaj pytanie:" << endl;
         getline(cin,buf);
         cout << "Zadaj pytanie:" << endl;
         getline(cin,buf);
@@ -299,21 +286,9 @@ public:
         wsk[l_pytan].odp_pop = buf;
     }
 
-    int rozw_quiz(Pytanie *p)
+    void koniec()
     {
-        int i;
-        int suma_pkt = 0; //suma zdobytych punktow
-        for (i = 0; i <= l_pytan; i++) {
-            p[i].zadaj();
-            p[i].sprawdz();
-            suma_pkt += p[i].punkt;
-        } // tworzymy liste obietkow, czyli pytan ;)
-        wynik = suma_pkt;
-
-        printw("%s\n","KONIEC QUIZU!\n");
-        zdaneczynie(suma_pkt,i);
-
-        return 0;
+        exit(1);
     }
 
 
@@ -330,7 +305,7 @@ public:
     void refreshRoutine(){
         static int refreshed = 0;
         getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
-        move(5, 0);
+        move(7, 0);
         printw("Refreshed%d!",refreshed);
         refreshed++;
     }
@@ -338,13 +313,9 @@ public:
 
     void setEntry(std::string key, std::string value) override {
         entries[key] = value;
-        move(1,0);
-        printw("Entry set\n");
     }
 
     std::string getEntry(std::string string) override {
-        move(1,0);
-        printw("Entry set\n");
         return entries[string];
 
     }
@@ -353,16 +324,20 @@ public:
 
         auto witaj = [&]() { this->res.witaj();};
         auto struktura = [this](){ this->res.wprowadz(pytania,entries["filename"]);};
-        auto edit = [this](){ this->res.editMode();};
         //auto dodaj = [this](){ this->res.dodaj_pyt(pytania);};
         auto rozw = [this](){this ->res.rozw_quiz(pytania);};
+        //auto koniec = [this](){ this ->res.koniec();};
+        auto dodaj = [this](){this ->res.dodaj_pyt(pytania);};
 
 
         obj -> setRefreshRoutine([&]()mutable {this -> refreshRoutine();});
+
         obj -> bind("w", witaj, "Powitalny tekst");
         obj -> bind("#vim#:s ${filename}<ENTER>", struktura, "Wprowadza pytania do struktury");
         obj -> bind("r",rozw,"Rozwiaz quiz");
-        obj -> bind("e",edit,"Tryb edytowania");
+        obj -> bind("d",dodaj,"Dodaj pytanie");
+        //obj -> bind("k",koniec,"Wyjdz z programu");
+
 
 
 
