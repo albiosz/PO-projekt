@@ -17,37 +17,12 @@ public:
 	    test_var = 125;
 	}
 	//void setEntry(std::string entry, std::string entry_value) override {std::cout << "Entry's been set. " << "Entry: " << entry << " Entry value: " << entry_value << std::endl;}
-	void setEntry(std::string entry, std::string entry_value) override {move(1,0); printw("Entry set\n");}
+	void setEntry(std::string entry, std::string entry_value) override {move(1,0); printw("Entry set: %s\n", entry_value.c_str());}
 	std::string getEntry(std::string) override {move(1,0); printw("Entry get\n"); return "YES";}
 
 	static void methA(){
 		move(0,0);
 	    printw("%s\n", "method A");
-	}
-	void editMode(){
-		static int x=0,y=0; // position of a cursor
-	    getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
-	    move(rows-1,0);
-	    clrtoeol();
-	    printw("-- Edit Mode --");
-	    move(y,x);
-	    char c;
-		do{
-	        c = getch();
-	    	switch (c){
-	    		case 27:
-	                getyx(curscr,y,x);
-	    			return;
-	    			break;
-	    		case 127:
-	                eraseChar();
-	                break;
-	    		default:
-	                printw("%c",c);
-	    		break;
-	    	}
-
-	    } while(true);
 	}
 
 	void editMode2(){
@@ -88,11 +63,13 @@ public:
         back -> bind("#vim#:open ${FILE_NAME}<ENTER>", &OneFrontend::methA, "Open a file from class");
         back -> bind("#vim#:save ${FILE_NAME}<ENTER>",[&]() mutable {this -> testFunc();}, "Open a file");// <-- the same command but different function
         back -> bind("<ENTER>!EDIT", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
-        back -> bind("<CTRL>A", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
+        back -> bind("<CTRL>A!EDIT", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
         back -> bind("<UP>", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
         back -> bind("<DOWN>!EDIT", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
         back -> bind("<LEFT>", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
         back -> bind("<RIGHT>", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
+        back -> bind("1", [&]() mutable {this -> testFunc();}, "Open a file ctrl R");
 
-	};
+
+    };
 };

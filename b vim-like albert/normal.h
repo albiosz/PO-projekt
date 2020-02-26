@@ -26,20 +26,19 @@ private:
 	int columns,rows; // rozmiary okna
 	std::string write();
 	void printMode(std::string);
-    std::map<std::string, Command> commands;
 
 protected:
 	std::function<void()> edition;
 	std::function<void()> refreshRoutine;
+    std::map<std::string, Command> commands;
     Frontend *frontend;
 
 public:
 	Normal(Frontend* front);
 	char normalMode();
 	void editMode();
-	void addCommand(std::string, std::string, bool edit_mode, std::function<void()>);
 	bool chooseFunction(std::string com);
 	void eraseChar();
 	char quit();
-    std::string ctrlAndArrowsHandling(int c);
+    std::string oneCharHandling(int c);
 };

@@ -22,5 +22,5 @@ public:
 	void setRefreshRoutine(std::function<void()>) override;
 	int findComment(std::string);
     std::string replaceSpecial(std::string);
-
+    void addCommand(std::string, std::string, bool edit_mode, std::function<void()>);
 };

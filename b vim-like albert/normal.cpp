@@ -6,14 +6,13 @@ Normal::Normal(Frontend* front){
 }
 
 char Normal::normalMode(){
-
-	getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
-    std::string command="";
 	do{
+        std::string command="";
         printMode("normal");
-        move(0,0);
+        getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
 
         int c;
+        move(rows-1,0);
         c = getch();
     	switch (c){
             case 'Z': // press double 'Z' to exit
@@ -23,16 +22,10 @@ char Normal::normalMode(){
     			command = write(); // command which starting with : and confirmed by enter
     			break;
     		default:
-    		    if ((c>=0 && c<=31 && c!=ENTER) || (c>=258 && c<=261))
-    		        command = ctrlAndArrowsHandling(c);
-    		    else
-                    command = std::string(1,c); // one character command
-
-                //std::cout << command << std::endl;
+    		    command = oneCharHandling(c);
     		    break;
     	}
-        move(0,0);
-        //clear();
+
     	if (!command.empty()){
     		if (command == ":q" || command == ":quit")
     		    return quit();
@@ -41,9 +34,9 @@ char Normal::normalMode(){
             else
                 chooseFunction(command);
     	}
-        refreshRoutine();
 
-        command = "";
+    	clear();
+        refreshRoutine();
 
     } while(true);
 }
@@ -68,13 +61,12 @@ bool Normal::chooseFunction(const std::string com){
             }
         }
 
+        commands[comI].function();
+
         if (commands[comI].edit_mode){
-            edition();
             printMode("edit");
             editMode();
         }
-
-        commands[comI].function();
 
         return true;
     }
@@ -102,7 +94,6 @@ std::string Normal::write(){
 		switch(c){
 			case ESC:
 				return "";
-				break;
 			case KEY_BACKSPACE:
 			    if (text.length() > 1) {
                     eraseChar();
@@ -114,7 +105,6 @@ std::string Normal::write(){
     		default:
                 printw("%c",c);
                 text += c;
-                break;
 		}
 	}
 }
@@ -124,7 +114,7 @@ void Normal::printMode(std::string mode){
     int x, y;
     getyx(stdscr, y, x);
     getmaxyx( stdscr, rows, columns ); //Pobieranie wartości okna do zmiennych
-    move(rows-1,0);
+    move(rows-1,columns - 17);
     clrtoeol();
     if (mode == "normal")
         printw("-- Normal Mode --");
@@ -141,45 +131,38 @@ void Normal::eraseChar(){
 }
 
 void Normal::editMode() {
-    char c;
-    c = getch();
-    switch(c) {
-        case ESC:
-            return;
-        default:
-            frontend->setEntry("KEY", std::string(1, c));
+    while (true) {
+        int c;
+        c = getch();
+        switch (c) {
+            case ESC:
+                return;
+            default:
+                frontend->setEntry("KEY", oneCharHandling(c));
+                edition();
+        }
     }
-
 }
 
-std::string Normal::ctrlAndArrowsHandling(int c) {
-    std::string toReturn = "";
-
+std::string Normal::oneCharHandling(int c) {
+    printw("%d",c);
     switch(c){
         case KEY_UP:
-            toReturn = "<UP>";
-            break;
+            return "<UP>";
         case KEY_DOWN:
-            toReturn = "<DOWN>";
-            break;
+            return "<DOWN>";
         case KEY_LEFT:
-            toReturn = "<LEFT>";
-            break;
+            return "<LEFT>";
         case KEY_RIGHT:
-            toReturn = "<RIGHT>";
-            break;
+            return "<RIGHT>";
+        case KEY_BACKSPACE:
+            return "<BACKSPACE>";
         default: // it is considered as a ctrl by default
-            toReturn = "<CTRL>" + std::string(1,c+64);
+            if (c == ENTER)
+                return "<ENTER>";
+            else if (c>=0 && c<=31)
+                return "<CTRL>" + std::string(1,c+64);
+            else if (c >= 33 && c <= 126)
+                return std::string(1,c);
     }
-
-    return toReturn;
-}
-
-
-void Normal::addCommand(std::string com, std::string entry, bool edit_mode, std::function<void()> func){
-    if (commands.find(com) != commands.end()){
-        auto it = commands.find(com);
-        commands.erase(it);
-    }
-    commands[com] = Command{entry, edit_mode, func};
 }

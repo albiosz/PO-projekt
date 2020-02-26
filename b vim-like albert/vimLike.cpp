@@ -42,6 +42,7 @@ void VimLike::bind(std::string key_comb, std::function<void()> func, std::string
         edition = func;
         return;
     }
+
     bool edit_mode = false;
     if (key_comb1.length() > 5 && key_comb1.substr(key_comb1.length()-5) == "!EDIT") {
         edit_mode = true;
@@ -71,7 +72,7 @@ void VimLike::bind(std::string key_comb, std::function<void()> func, std::string
 std::string VimLike::replaceSpecial(std::string key_comb){
 
     std::string key_comb1 = key_comb;
-    if (key_comb1.length() >= 7 && key_comb1.substr(key_comb1.length()-7) == "<ENTER>"){ // erase <ENTER> from command
+    if (key_comb1.length() > 7 && key_comb1.substr(key_comb1.length()-7) == "<ENTER>"){ // erase <ENTER> from command
         key_comb1 = key_comb1.substr(0,key_comb1.length()-7);
     }
 
@@ -92,4 +93,13 @@ int VimLike::findComment(std::string command){
 
 void VimLike::setRefreshRoutine(std::function<void()> reFunc){
     refreshRoutine = reFunc;
+}
+
+
+void VimLike::addCommand(std::string com, std::string entry, bool edit_mode, std::function<void()> func){
+    if (commands.find(com) != commands.end()){
+        auto it = commands.find(com);
+        commands.erase(it);
+    }
+    commands[com] = Command{entry, edit_mode, func};
 }
