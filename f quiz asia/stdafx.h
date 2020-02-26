@@ -11,3 +11,5 @@
 #include <cstring>
 #include <functional>
 #include <algorithm>
+#include <stdio.h>
+#include <curses.h>

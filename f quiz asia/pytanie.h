@@ -3,7 +3,27 @@
 //
 #pragma once
 #include "stdafx.h"
+#define ENTER 10
+
 using namespace std;
+
+string edycja()
+{
+    string a="";
+    char c;
+    while(ENTER != (c = getch()))
+    {
+        printw("%c",c);
+        a += c;
+        if(c == ESC)
+        {
+            printw("\n\r");
+            break;
+        }
+    }
+    return a;
+
+}
 
 class Pytanie
 {
@@ -54,15 +74,20 @@ void Pytanie::wczytaj(string nazwa)
 
 void Pytanie::zadaj()
 {
-    cout << endl << tresc << endl;
-    cout << a << endl;
-    cout << b << endl;
-    cout << c << endl;
-    cout << d << endl;
-    cout<< "------------------------" << endl;
+    cout << endl << "\r" << tresc << endl << "\r";
+    cout << a << endl << "\r";
+    cout << b << endl << "\r";
+    cout << c << endl << "\r";
+    cout << d << endl << "\r";
+    cout<< "------------------------" << endl << "\r";
     cout<< "Odpowiedz: ";
-    cin >> odp_usr;
+    //cin >> odp_usr;
+    odp_usr = edycja();
+
 }
+
+
+
 
 void Pytanie::sprawdz()
 {

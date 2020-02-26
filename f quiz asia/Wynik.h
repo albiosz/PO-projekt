@@ -8,8 +8,9 @@ using namespace std;
 
 #define PROG 75
 #define PYT 50
-Pytanie pytania[PYT];
+#define ENTER 10
 int l_pytan;
+Pytanie pytania[PYT];
 
 class Quiz : public Pytanie
 {
@@ -35,115 +36,19 @@ public:
     }
 
 
-    //funkcja do zczytania z pliku quizu
-
-
-    // funkcja sprawdz, czy uzytkownik zdal test czy nie
-
 
     int otworz(string nazwa) {
         plik.open(nazwa, ios::out | ios::trunc);
         if (plik.good()) {
-            cout << "Udalo sie otworzyc plik pomyslnie! :D" << endl;
-        } else cout << "Nie udalo sie otworzyc pliku" << endl;
+            printw("%s\n\r","Udalo sie otworzyc plik pomyslnie! :D");
+        } else
+            printw("%s\n\r","Nie udalo sie otworzyc pliku");
 
         return 0;
     }
 
 
-    virtual void wprowadz(Pytanie *p, string nazwa)
-    {   int i;
-        int count = 0;
-        l_pytan = 0;
-        string linia;
-        plik.open(nazwa,ios::in);
-        while (getline(plik,linia)) { count++;}
-        for (i=0;i<count/5;i++) {
-            p[i].nr_pytania = i + 1;
-            p[i].wczytaj(nazwa);
-        }
-        plik.close();
 
-        l_pytan = count/6-1 ; //pytan jest o 1 wiecej ale w tablicy obiektow numerujemy od zera
-    }
-
-// funkcja przeprowadza test i sumuje uzyskana liczbe punktow
-int rozw_quiz(Pytanie *p)
-{
-    int i;
-    int suma_pkt = 0; //suma zdobytych punktow
-    for (i = 0; i <= l_pytan; i++) {
-        p[i].zadaj();
-        p[i].sprawdz();
-        suma_pkt += p[i].punkt;
-    } // tworzymy liste obietkow, czyli pytan ;)
-    wynik = suma_pkt;
-
-    cout << "KONIEC QUIZU!\n";
-    zdaneczynie(suma_pkt,i);
-
-    return 0;
-}
-
-    void dodaj_pyt(Pytanie *wsk)
-    {
-        string buf;
-        char buff[512];
-        l_pytan++;
-        getline(cin,buf);
-        cout << "Zadaj pytanie:" << endl;
-        getline(cin,buf);
-        wsk[l_pytan].tresc=buf;
-        wsk[l_pytan].nr_pytania = l_pytan+1;
-        cout << "Podaj pierwsza odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"a) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].a = buff;
-        cout << "Podaj druga odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"b) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].b = buff;
-        cout << "Podaj trzecia odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"c) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].c = buff;
-        cout << "Podaj czwarta odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"d) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].d = buff;
-        cout << "Podaj poprawna odpowiedz: a dla pierwszej podanej odpowiedzi...d dla czwartej podanej odpowiedzi" <<endl;
-        getline(cin,buf);
-        wsk[l_pytan].odp_pop = buf;
-    }
-
-    void zapisz_plik(Pytanie *p)
-    {
-        int i;
-        string miejsce;
-        string nazwa;
-        string pelna;
-        cout << "Podaj pelna sciezke miejsca, w ktorym chcesz zapisac plik z quizem:" << endl;
-        cin >> miejsce;
-        cout << "Podaj nazwe pliku z rozszerzeniem .txt:" << endl;
-        cin >> nazwa;
-        pelna = miejsce+"/"+nazwa;
-        cout << pelna << endl;
-        otworz(pelna);
-        for (i=0; i<=l_pytan; i++)
-        {
-            plik << p[i].tresc << endl;
-            plik << p[i].a << endl;
-            plik << p[i].b << endl;
-            plik << p[i].c << endl;
-            plik << p[i].d << endl;
-            plik << p[i].odp_pop << endl;
-        }
-        plik.close();
-    }
 
 
 
@@ -163,49 +68,25 @@ public:
         delch();
     }
 
-
-
-    void start()
+    void zapisz_plik(Pytanie *p,const std::string& nazwa)
     {
-        cout << "Witaj w QUIZIE!";
-        while (1) {
-            cout <<  "\n\nWybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej cyfry i zatwierdzenie jej ENTEREM" << endl;
-            cout << "1 - Tryb edycji pytan\n" << "2 - Tryb rozwiazywania quizu\n" << "3 - Wyjdz z programu\n" << endl;
-            cout << "Wybieram tryb:" << endl;
-            cin >> tryb;
-            if (tryb==1)
-            {
-                string quiz;
-                string plus = "t";
-                cout << "Ktory chcesz zedytowac quiz?" << endl;
-                cin >> quiz;
-                wprowadz(pytania,quiz);
-                while (plus == "t") {
-                    dodaj_pyt(pytania);
-                    cout << "Czy chcesz dodac kolejne pytanie? Wpisz \"t\" jesli tak, dowolny znak jesli nie:" << endl;
-                    cin >> plus;
-                }
-                cout << "Czy chcesz zapisać zedytowany przez Ciebie quiz?" << endl;
-                cout << "Jeśli tak, wpisz na klawiaturze litere \"t\"\nJesli nie, wpisz litere \"n\":\n";
-                cin >> funkcja;
-                if (funkcja=='t') zapisz_plik(pytania);
-                if (funkcja=='n') cout << "Twoj zedytowany plik nie zostal zapisany" << endl;
-            }
-
-            else if (tryb==2)
-            {
-                string quiz;
-                cout << "Ktory chcesz uruchomic quiz? (jesli quiz jest spoza tego folderu dodaj sciezke)" << endl;
-                cin >> quiz;
-                wprowadz(pytania,quiz);
-                rozw_quiz(pytania);
-
-            }
-            else if (tryb==3)
-            {
-                exit(0);
-            }
+        int i;
+        string buf;
+        zeruj();
+        otworz(nazwa);
+        for (i=0; i<=l_pytan; i++)
+        {
+            plik << p[i].tresc << endl;
+            plik << p[i].a << endl;
+            plik << p[i].b << endl;
+            plik << p[i].c << endl;
+            plik << p[i].d << endl;
+            plik << p[i].odp_pop << endl;
         }
+        plik.close();
+        printw("%s\n\r","Wcisnij ENTER zeby kontynuowac");
+        buf = edycja();
+        clear();
     }
 
     void wprowadz(Pytanie *p, const std::string& nazwa)
@@ -227,68 +108,166 @@ public:
     void witaj()
     {
         cout << "Witaj w QUIZIE!\n\r";
-        cout << "\n\rWybierz co chcesz zrobic poprzez wpisanie na klawiaturze odpowiedniej cyfry i zatwierdzenie jej ENTEREM\n\r";
-        cout <<"1 - Tryb edycji pytan\n\r";
-        cout << "2 - Tryb rozwiazywania quizu\n\r";
-        cout << "3 - Wyjdz z programu\n\r";
+        cout << "\n\rWybierz co chcesz zrobic poprzez wpisanie odpowiedniej komendy na klawiaturze\n\r";
+        cout << ":d nazwa_quizu.txt - Tryb edycji pytan\n\r";
+        cout << ":r nazwa_quizu.txt - Tryb rozwiazywania quizu\n\r";
+        cout << ":z /pelna/sciezka/quizu.txt lub nazwa_quizu.txt - Zapisywanie quizu\n\r";
+        cout << ":s nazwa_quizu.txt - Zaladuj quiz z pliku do struktury\n\r";
+        cout << "c - Odswierz ekran\n\r";
+
+
     }
 
-    int rozw_quiz(Pytanie *p)
+    int rozw_quiz(Pytanie *p, const std::string& nazwa)
     {
         int i;
-        int suma_pkt = 0; //suma zdobytych punkto
+        int suma_pkt = 0; //suma zdobytych punktow
+        static int x=0,y=0;// position of a cursor
+        int a;
+        string buf;
+        getmaxyx( stdscr, rows, columns );//Fetching window size to variables rows and columns
+        a = rows-1;
+        clear();
+        move(a,0);
+        printw("-- Rozwiazywanie quizu --");
+        move(y,x);
+        wprowadz(p,nazwa);
         for (i = 0; i <= l_pytan; i++) {
+            refresh();
             p[i].zadaj();
             p[i].sprawdz();
             suma_pkt += p[i].punkt;
         } // tworzymy liste obietkow, czyli pytan ;)
         wynik = suma_pkt;
-
         cout << endl << "\r" << "KONIEC QUIZU!\n\r";
         zdaneczynie(suma_pkt,i);
+        printw("%s\n\r","Wcisnij ENTER zeby wyjsc z trybu rozwiazywania quizu");
+        buf = edycja();
+        clear();
+
 
         return 0;
     }
 
-    void dodaj_pyt(Pytanie *wsk)
-    {
+    int dodaj_pyt(Pytanie *wsk,const std::string& nazwa) {
+        static int x = 0, y = 0;// position of a cursor
+        int a;
+        getmaxyx(stdscr, rows, columns);//Fetching window size to variables rows and columns
+        clear();
+        a = rows - 1;
+        move(a, 0);
+        clrtoeol();
+        printw("-- Edycja quizu --");
+        move(x, y);
+        wprowadz(wsk, nazwa);
         string buf;
         char buff[512];
-        l_pytan++;
-        cout << "Zadaj pytanie:" << endl;
-        getline(cin,buf);
-        cout << "Zadaj pytanie:" << endl;
-        getline(cin,buf);
-        wsk[l_pytan].tresc=buf;
-        wsk[l_pytan].nr_pytania = l_pytan+1;
-        cout << "Podaj pierwsza odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"a) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].a = buff;
-        cout << "Podaj druga odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"b) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].b = buff;
-        cout << "Podaj trzecia odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"c) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].c = buff;
-        cout << "Podaj czwarta odpowiedz" <<endl;
-        getline(cin,buf);
-        strcpy(buff,"d) ");
-        strcat(buff,buf.c_str());
-        wsk[l_pytan].d = buff;
-        cout << "Podaj poprawna odpowiedz: a dla pierwszej podanej odpowiedzi...d dla czwartej podanej odpowiedzi" <<endl;
-        getline(cin,buf);
-        wsk[l_pytan].odp_pop = buf;
+            l_pytan++;
+            move(0, 0);
+            printw("%s\n\r", "Zadaj pytanie");
+            //cout << "\n\r" << "Zadaj pytanie:" << endl << "\r";
+            buf = edycja();
+            wsk[l_pytan].tresc = buf;
+            wsk[l_pytan].nr_pytania = l_pytan + 1;
+            cout << "\n\r" << "Podaj pierwsza odpowiedz" << endl << "\r";
+            getyx(stdscr, rows, columns);
+            move(rows, 0);
+            buf = edycja();
+            strcpy(buff, "a) ");
+            strcat(buff, buf.c_str());
+            wsk[l_pytan].a = buff;
+            cout << "\n\r" << "Podaj druga odpowiedz" << endl << "\r";
+            getyx(stdscr, rows, columns);
+            move(rows, 0);
+            buf = edycja();
+            strcpy(buff, "b) ");
+            strcat(buff, buf.c_str());
+            wsk[l_pytan].b = buff;
+            cout << "\n\r" << "Podaj trzecia odpowiedz" << endl << "\r";
+            getyx(stdscr, rows, columns);
+            move(rows, 0);
+            buf = edycja();
+            strcpy(buff, "c) ");
+            strcat(buff, buf.c_str());
+            wsk[l_pytan].c = buff;
+            cout << "\n\r" << "Podaj czwarta odpowiedz" << endl << "\r";
+            getyx(stdscr, rows, columns);
+            move(rows, 0);
+            buf = edycja();
+            strcpy(buff, "d) ");
+            strcat(buff, buf.c_str());
+            wsk[l_pytan].d = buff;
+            cout << "\n\r"
+                 << "Podaj poprawna odpowiedz: a dla pierwszej podanej odpowiedzi...d dla czwartej podanej odpowiedzi"
+                 << endl << "\r";
+            getyx(stdscr, rows, columns);
+            move(rows, 0);
+            buf = edycja();
+            wsk[l_pytan].odp_pop = buf;
+
+        printw("\n\r%s\n\r", "Wcisnij ENTER zeby wyjsc z trybu edycji quizu");
+        buf = edycja();
+        clear();
+
+        return 0;
     }
 
-    void koniec()
+    string edycja()
     {
-        exit(1);
+        string a="";
+        char c;
+        while(ENTER != (c = getch()))
+        {
+            printw("%c",c);
+            a += c;
+            if(c == ESC)
+            {
+                printw("\n\r");
+                break;
+            }
+        }
+        return a;
+
+    }
+
+    void refreshRoutine(){
+        static int refreshed = 0;
+        getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
+        move(5, 0);
+        //printw("Refreshed%d!",refreshed);
+        refreshed++;
+    }
+
+
+    void editMode(){
+        static int x=0,y=0; // position of a cursor
+        getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
+        move(rows-1,0);
+        clrtoeol();
+        printw("-- Edit Mode --");
+        move(y,x);
+        char c;
+        do{
+            c = getch();
+            switch (c){
+                case 27:
+                    getyx(curscr,y,x);
+                    return;
+                    break;
+                case 127:
+                    eraseChar();
+                    break;
+                default:
+                    printw("%c",c);
+                    break;
+            }
+
+        } while(true);
+    }
+
+    void zeruj()
+    {
+        clear();
     }
 
 
@@ -299,14 +278,13 @@ class Wynik : public Frontend
 {
 public:
 
-    Pytanie pytania[PYT];
     int rows, columns;
 
     void refreshRoutine(){
         static int refreshed = 0;
         getmaxyx( stdscr, rows, columns ); //Fetching window size to variables rows and columns
-        move(7, 0);
-        printw("Refreshed%d!",refreshed);
+        move(0, 0);
+        //printw("Refreshed%d!",refreshed);
         refreshed++;
     }
 
@@ -322,24 +300,22 @@ public:
 
     void setBackend(Backend *obj) override {
 
-        auto witaj = [&]() { this->res.witaj();};
+        auto witaj = [this]() { this->res.witaj();};
         auto struktura = [this](){ this->res.wprowadz(pytania,entries["filename"]);};
-        //auto dodaj = [this](){ this->res.dodaj_pyt(pytania);};
-        auto rozw = [this](){this ->res.rozw_quiz(pytania);};
-        //auto koniec = [this](){ this ->res.koniec();};
-        auto dodaj = [this](){this ->res.dodaj_pyt(pytania);};
+        auto rozw = [this](){this ->res.rozw_quiz(pytania,entries["filename"]);};
+        auto zapisz = [this](){this ->res.zapisz_plik(pytania,entries["filename"]);};
+        auto dodaj = [this](){this ->res.dodaj_pyt(pytania,entries["filename"]);};
+        auto zer = [this]() { this->res.zeruj();};
 
 
         obj -> setRefreshRoutine([&]()mutable {this -> refreshRoutine();});
 
         obj -> bind("w", witaj, "Powitalny tekst");
+        obj -> bind("#vim#:r ${filename}<ENTER>",rozw,"Rozwiaz quiz");
+        obj -> bind("#vim#:d ${filename}<ENTER>", dodaj, "Tryb edycji, dodaj pytanie");
+        obj -> bind("#vim#:z ${filename}<ENTER>", zapisz, "Zapisuje do pliku");
         obj -> bind("#vim#:s ${filename}<ENTER>", struktura, "Wprowadza pytania do struktury");
-        obj -> bind("r",rozw,"Rozwiaz quiz");
-        obj -> bind("d",dodaj,"Dodaj pytanie");
-        //obj -> bind("k",koniec,"Wyjdz z programu");
-
-
-
+        obj -> bind("c", zer, "Wprowadza pytania do struktury");
 
     }
 private:

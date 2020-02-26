@@ -3,6 +3,7 @@
 #include "vimLike.h"
 #include "Wynik.h"
 #include "frontend.h"
+#include "oneFrontend.h"
 
 int main(){
 
@@ -13,6 +14,9 @@ int main(){
     VimLike backend(&frontend);
     backend.runBackend();
 
+    //OneFrontend frontend;
+    //VimLike backend(&frontend);
+    //backend.runBackend();
 
 
     return 0;
