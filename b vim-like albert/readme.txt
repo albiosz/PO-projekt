@@ -1,10 +1,11 @@
 Vim like backend - instrukcja użytkowania - W RAZIE BRAKÓW ALBO BŁĘDÓW W KODZIE PISZCIE NA FB ;)
 
+0. Kompilacja - g++ *.cpp -o app -lncurses
 
 1. Konstrukcja funkcji pośredniczącej między backendem, a toolem - bind
 backend->bind( (1)komenda, (2)funkcja, (3)instrukcja ) przykładowe wywołanie "backend->bind("#vim#:a<ENTER>", fun, "Help guidance instructions")"
 
-(1)komenda - mogą być w stylu "vimowski" (np. ":a"), jedno znakowe (np. "a"), <CTRL> + litera (np. "<CTRL>W") lub strzałki ("<UP>", "<DOWN>","<LEFT>","<RIGHT>").
+(1)komenda - mogą być w stylu "vimowski" (np. ":a"), jedno znakowe (np. "a"), <CTRL> + litera (np. "<CTRL>W"), strzałki ("<UP>", "<DOWN>","<LEFT>","<RIGHT>"), backspace("<BACKSPACE>"), enter("<ENTER>") ... można dodać obsługę większej ilości jeśli będzie potrzeba.
 UWAGA! Komenda <CTRL> nie działa z literami Q, S, J, Z, C, M
 
 
@@ -32,6 +33,9 @@ back -> bind("#vim#:open ${FILE_NAME}<ENTER>", &OneFrontend::methA, "Open a file
 
 3. Komneda żeby wyjść z backendu :q, :quit, ZZ. Przy wychodzeniu zostanie sprawdzona wartość toola "IS_SAVED" == "NO" (tool->getEntry("IS_SAVED") == "NO")). Jeśli zostanie zwrócona wartość "true" to użytkownik zostanie zapytany czy na pewno ma zamiar opóścić aplikację.
 
-4. W trybie edycji  pobieramy jeden znak z klawiatury, który zostanie zapisany w sekcji "KEY" np. tool->getEntry("KEY","A").
+4. W trybie edycji wykonujemy w pętli operacje:
+  - pobrania jednego znaku z klawiatury, który zostanie zapisany w sekcji "KEY" np. tool->aetEntry("KEY","A")
+  - wywołania funkcji przypisanego jako tryb edycji przez tworzącego frontend
+Wyjeście z trybu edycji nastąpi gdy użytkownik naciśnie "Escape".
 
 5. Konieczne jest zbindowanie funkcji refreshRoutine (np. back -> setRefreshRoutine([&]() mutable {this -> refreshRoutine();});). Powinna to być funkcja która odświerza zawartość ekranu (backend przed jej wykonaniem zeruje wszystko co jest na ekranie - tutaj mogą być różne koncepcje dlatego w razie konfliktu można dokonać zmiany)
