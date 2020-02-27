@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string>
 #include <sstream>
-
+#include <map>
 using namespace std;
 
 class buferCeneter{
@@ -44,7 +44,7 @@ public:
     }
 };
 
-class texteditor{
+class texteditor::frontend{
 private:
     vector<int> lineLength;
     string buffer = "";
@@ -61,6 +61,7 @@ private:
     buferCeneter BC;
 public:
     texteditor(string paths, string pathl){
+        std::map<std::string, std::string> entries;
         this->paths = paths;
         this->pathl = pathl;
         initscr();
@@ -74,7 +75,8 @@ public:
     }
 
 private:
-    void mainFoo(int ch) {
+    void mainFoo() {
+        entry[key] = ch;
         switch (ch) {
             case KEY_LEFT:
                 if (x != 0 || y != 0) {
@@ -244,7 +246,13 @@ private:
         lineL = xline;
         x = maxX;
     }
+    void setEntry(std::string key, std::string value) override {
+        entries[key] = value;
+    }
 
+    std::string getEntry(std::string string) override {
+        return entries[string];
+    }
 };
 
 
