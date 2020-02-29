@@ -51,7 +51,6 @@ private:
     fstream file;
     string paths;
     string pathl;
-    string conv = "";
     int x = 0;
     int y = 0;
     int maxX = 0;
@@ -60,10 +59,8 @@ private:
     //char cursesString[9000];
     buferCeneter BC;
 public:
-    texteditor(string paths, string pathl){
+    texteditor(){
         std::map<std::string, std::string> entries;
-        this->paths = paths;
-        this->pathl = pathl;
         initscr();
         clear();
         scrollok(stdscr, TRUE);
@@ -75,10 +72,9 @@ public:
     }
 
 private:
-    void mainFoo() {
-        entry[key] = ch;
+    void mainFoo(string ch) {
         switch (ch) {
-            case KEY_LEFT:
+            case "<LEFT>":
                 if (x != 0 || y != 0) {
                     x--;
                     xline--;
@@ -91,7 +87,7 @@ private:
                 }
                 break;
 ////////////////////////////////////////////////
-            case KEY_RIGHT:
+            case "<RIGHT>":
                 if (x + 1 <= maxX) {
                     x++;
                     xline++;
@@ -103,7 +99,7 @@ private:
                 }
                 break;
 /////////////////////////////////////////////////
-            case KEY_UP:
+            case "<UP>":
                 if (y > 0) {
                     if (lineLength[y - 1] < xline) {
                         y--;
@@ -118,7 +114,7 @@ private:
                 }
                 break;
 /////////////////////////////////////////////////
-            case KEY_DOWN:
+            case "<DOWN>":
                 if (y < lineLength.size() - 1) {
                     y++;
                     if (xline > lineLength[y]) {
@@ -132,7 +128,7 @@ private:
                 }
                 break;
 /////////////////////////////////////////////////
-            case 263: //backspace trzeba resize
+            case "<BACKSPACE>": //backspace trzeba resize
                 if (x > 0) {
                     buffer.erase(x - 1, 1);
                     if (xline == 0 && x > 0) {
@@ -160,7 +156,7 @@ private:
                 }
                 break;
 ////////////////////////////////////////////////////
-            case 10: // enter
+            case "<ENTER>": // enter
                 BC.addBuf(buffer);
                 buffer.insert(x, "\n");
 
@@ -176,12 +172,10 @@ private:
                 maxX++;
                 break;
             default:
-                if (ch == ' ') {
+                if (ch == " ") {
                     BC.addBuf(buffer);
                 }
-
-                conv = ch;
-                buffer.insert(x, conv);
+                buffer.insert(x, ch);
                 clear();
                 x++;
                 xline++;
@@ -194,11 +188,11 @@ private:
                 }
 
         }
-        clear();
+    }
+    void refreshR{
         printw("%s\n", buffer.c_str());
         refresh();
-    }
-
+    };
     void undo(){
         buffer = BC.undo();
         resizeX();
@@ -262,7 +256,7 @@ int main() {
 
     paths = "/home/ciszek/PO/textbuf.txt";
     pathl = "/home/ciszek/PO/testload.txt";
-    texteditor editor(paths, pathl);
+    texteditor editor();
 
     return 0;
 }
