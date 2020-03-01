@@ -1,5 +1,7 @@
 #include <map>
-
+#include "./backend.h"
+#include "./frontend.h"
+#include "./mainForMerge.cpp"
 class Toolbind::public Frontend{
 private:
     texteditor tooldvc;

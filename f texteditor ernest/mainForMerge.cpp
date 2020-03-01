@@ -44,7 +44,7 @@ public:
     }
 };
 
-class texteditor::frontend{
+class texteditor{
 private:
     vector<int> lineLength;
     string buffer = "";
@@ -58,23 +58,10 @@ private:
     int lineL = 0;
     //char cursesString[9000];
     buferCeneter BC;
+    std::map<std::string, std::string> entries;
 public:
-    texteditor(){
-        std::map<std::string, std::string> entries;
-        initscr();
-        clear();
-        scrollok(stdscr, TRUE);
-        raw();
-        keypad(stdscr, TRUE);
-        noecho();
-
-        mainLoop();
-    }
-
-private:
     void mainFoo(string ch) {
-        switch (ch) {
-            case "<LEFT>":
+            if(ch == "<LEFT>") {
                 if (x != 0 || y != 0) {
                     x--;
                     xline--;
@@ -85,9 +72,7 @@ private:
 
                     }
                 }
-                break;
-////////////////////////////////////////////////
-            case "<RIGHT>":
+            }else if(ch == "<RIGHT>") {
                 if (x + 1 <= maxX) {
                     x++;
                     xline++;
@@ -97,9 +82,7 @@ private:
                         lineL = lineLength[y];
                     }
                 }
-                break;
-/////////////////////////////////////////////////
-            case "<UP>":
+            }else if(ch == "<UP>") {
                 if (y > 0) {
                     if (lineLength[y - 1] < xline) {
                         y--;
@@ -112,9 +95,7 @@ private:
                         lineL = lineLength[y];
                     }
                 }
-                break;
-/////////////////////////////////////////////////
-            case "<DOWN>":
+            }else if(ch == "<DOWN>") {
                 if (y < lineLength.size() - 1) {
                     y++;
                     if (xline > lineLength[y]) {
@@ -126,9 +107,7 @@ private:
                         lineL = lineLength[y];
                     }
                 }
-                break;
-/////////////////////////////////////////////////
-            case "<BACKSPACE>": //backspace trzeba resize
+            }else if(ch == "<BACKSPACE>") { //backspace trzeba resize
                 if (x > 0) {
                     buffer.erase(x - 1, 1);
                     if (xline == 0 && x > 0) {
@@ -152,11 +131,8 @@ private:
                         xline--;
                         maxX--;
                     }
-
                 }
-                break;
-////////////////////////////////////////////////////
-            case "<ENTER>": // enter
+            }else if(ch == "<ENTER>") { // enter
                 BC.addBuf(buffer);
                 buffer.insert(x, "\n");
 
@@ -170,8 +146,7 @@ private:
                 x++;
                 y++;
                 maxX++;
-                break;
-            default:
+            }else {
                 if (ch == " ") {
                     BC.addBuf(buffer);
                 }
@@ -186,13 +161,12 @@ private:
                 } else {
                     lineLength.push_back(lineL);
                 }
-
-        }
+            }
     }
-    void refreshR{
+    void refreshR(){
         printw("%s\n", buffer.c_str());
         refresh();
-    };
+    }
     void undo(){
         buffer = BC.undo();
         resizeX();
@@ -240,23 +214,17 @@ private:
         lineL = xline;
         x = maxX;
     }
-    void setEntry(std::string key, std::string value) override {
-        entries[key] = value;
-    }
 
-    std::string getEntry(std::string string) override {
-        return entries[string];
-    }
 };
 
 
-int main() {
-    string paths;
-    string pathl;
-
-    paths = "/home/ciszek/PO/textbuf.txt";
-    pathl = "/home/ciszek/PO/testload.txt";
-    texteditor editor();
-
-    return 0;
-}
+//int main() {
+//    string paths;
+//    string pathl;
+//
+//    paths = "/home/ciszek/PO/textbuf.txt";
+//    pathl = "/home/ciszek/PO/testload.txt";
+//    texteditor editor();
+//
+//    return 0;
+//}
