@@ -141,6 +141,7 @@ void Normal::editMode() {
                 frontend->setEntry("KEY", oneCharHandling(c));
                 edition();
         }
+        refreshRoutine();
     }
 }
 
