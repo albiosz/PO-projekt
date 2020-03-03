@@ -141,6 +141,7 @@ void Normal::editMode() {
                 frontend->setEntry("KEY", oneCharHandling(c));
                 edition();
         }
+        clear();
         refreshRoutine();
     }
 }
@@ -163,7 +164,7 @@ std::string Normal::oneCharHandling(int c) {
                 return "<ENTER>";
             else if (c>=0 && c<=31)
                 return "<CTRL>" + std::string(1,c+64);
-            else if (c >= 33 && c <= 126)
+            else if (c >= 32 && c <= 126)
                 return std::string(1,c);
     }
 }
