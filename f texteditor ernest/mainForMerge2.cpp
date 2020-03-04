@@ -36,8 +36,8 @@ public:
             return AllChanges[--obsAC];
         }
     }
-    int containSubstring(string patern){
-        if(AllChanges[obsAC].find(patern)!=string::npos){
+    int containSubstring(string pattern){
+        if(AllChanges[obsAC-1].find(pattern)!=string::npos){
             return 1;
         }else{
             return 0;
@@ -48,6 +48,7 @@ public:
 class texteditor{
 private:
     vector<int> lineLength;
+    int refControl = 0;
     string buffer = "";
     fstream file;
     string paths;
@@ -62,6 +63,7 @@ private:
     std::map<std::string, std::string> entries;
 public:
     void mainFoo(string ch) {
+            refControl = 0;
             if(ch == "<LEFT>") {
                 if (x != 0 || y != 0) {
                     x--;
@@ -164,8 +166,21 @@ public:
                 }
             }
     }
+    void findIT(string pattern){
+        if(BC.containSubstring(pattern)){
+            refControl = 1;
+        } else{
+            refControl = 2;
+        }
+    }
     void refreshR(){
-        printw("%s\n", buffer.c_str());
+        if(refControl == 0) {
+            printw("%s\n", buffer.c_str());
+        } else if(refControl == 1){
+            printw("Pattern is in text");
+        } else if(refControl == 2){
+            printw("Pattern is not in the text");
+        }
         refresh();
     }
     void undo(){

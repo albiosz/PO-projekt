@@ -19,12 +19,18 @@ public:
         auto entLdPath = [this](){this->tooldvc.setPathl(entries["FILE_NAME"]);};
         auto entSvPath = [this](){this->tooldvc.setPaths(entries["FILE_NAME"]);};
         auto refresh = [this]() { this->tooldvc.refreshR();};
+        auto undo = [this](){this->tooldvc.undo();};
+        auto undoundo = [this](){this->tooldvc.undoUndo();};
         auto addLetter = [this]() { this->tooldvc.mainFoo(entries["KEY"]);};
         auto save = [this](){this->tooldvc.saving();};
         auto load = [this](){this->tooldvc.load();};
+        auto findIT = [this](){this->tooldvc.findIT(entries["FILE_NAME"]);};
         auto start = [](){};
 
         obj->setRefreshRoutine(refresh);
+        obj->bind("#vim#:f ${FILE_NAME}<ENTER>",findIT,"allows to check if given pattern is in the text");
+        obj->bind("#vim#:udud<ENTER>", undoundo, "undo last undo");
+        obj->bind("#vim#:ud<ENTER>",undo,"this command undo last change of a buffer");
         obj->bind("#vim#:j ${FILE_NAME}<ENTER>",jumper,"jumping to given line");
         obj->bind("#vim#:l<ENTER>",load,"loading buffer from a chosen location");
         obj->bind("#vim#:s<ENTER>",save,"saving state of the buffer in a chosen document");
