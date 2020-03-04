@@ -181,8 +181,15 @@ public:
         file << buffer;
         file.close();
     }
-    void jumpToline(int line){
-
+    void jumpToline(string line){
+        int chosenL = stoi(line) - 1;
+        x = 0;
+        y = chosenL;
+        if (chosenL < lineLength.size()) {
+            for (int i = 0; i < chosenL; i++) x += (lineLength[i]+1);
+            lineL = lineLength[chosenL];
+            xline = 0;
+        }
     }
     void load(){
         ostringstream loadbuf;
@@ -214,6 +221,12 @@ public:
         lineLength[y] = xline;
         lineL = xline;
         x = maxX;
+    }
+    void setPaths(string fileName){
+        paths = fileName;
+    }
+    void setPathl(string fileName){
+        pathl = fileName;
     }
 
 };
